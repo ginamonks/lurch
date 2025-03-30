@@ -56,9 +56,10 @@
   const sequence = s => {
     const a = s.map(texsymbol)
     if (a.length>2) {
-      return a.slice(0,-1).join('\\text{, }')+'\\text{, and }'+a[a.length-1]
+      return a.slice(0,-1).join(
+        '\\text{, }')+'\\text{, }\\textcolor{black}{\\text{and }}'+a[a.length-1]
     } else if (a.length === 2) {
-      return `${a[0]}\\text{ and }${a[1]}`
+      return `${a[0]}\\textcolor{black}{\\text{ and }}${a[1]}`
     } else {
       return a[0]
     }
@@ -294,7 +295,7 @@
   ]
 
   const UnicodeNames = {
-    '⋅' : '*'          ,  '≤' : 'leq'       , '¬' : 'not'    , '→' : 'to'        ,
+    '⋅' : '*'          ,  '≤' : 'leq'       , '¬' : 'neg'    , '→' : 'to'        ,
     '←' : 'from'       ,  '⇒' : 'implies'   , '⇔' : 'iff'    , '∩' : 'intersect' ,
     '∪' : 'union'      ,  '×' : 'cross'     , '∈' : 'in'     , '⊆' : 'subset'    ,
     '∖' : 'setminus'   ,  '∘' : 'circ'      , '∧' : 'wedge'  , '∨' : 'vee'       ,
@@ -311,7 +312,8 @@
     'divides'   : '|' , 'cdot'     : '⋅'  , '*'      : '⋅'  , 'love'         : 'loves' ,
     'in'        : '∈' , 'Sum'      : 'sum', '\\'     : ' '  , 'fear'         : 'fears' ,
     'complement': '°' , 'intersect': '∩'  , 'union'  : '∪'  , 'cap'          : '∩'     ,
-    'cup'       : '∪' , 'comp'     : '∘'  , 'circ'   : '∘'  , 'star'         : '★'
+    'cup'       : '∪' , 'comp'     : '∘'  , 'circ'   : '∘'  , 'star'         : '★'     ,
+    'neg'       : '¬'
   }
 
   // for use in Declare's, look up the internal name of a reserted word or
@@ -642,8 +644,8 @@ Prop = Iff
               { return a.join('\\text{ or }')       }
   And     = a:(Not/PropArg)|1..,_('and'/'wedge')_x|
               { return a.join('\\text{ and }')      }
-  Not     = _'not'_x b:PropArg
-              { return '\\text{not } '+b                   }
+  Not     = _'not'_x b:PropArg { return '\\text{not } '+b } / 
+            _'neg'_x b:PropArg { return '\\neg '+b }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Relations
@@ -695,7 +697,7 @@ Relations = Maps / Partition / Congruent / Subset / ElementOf / NotEltOf /
                 { return (b.length==6)
                   ? `${a}\\text{ ${b[0]} not ${b[2]} }${c}`
                   : `${a}\\text{ ${b[0]} not }${c}` } /
-               a:RelArg _ b:('is' __ 'an' __/'is' __ 'a' __/'is' __/'are'__) c:RelArg
+               a:RelArg _ b:('is' __ 'an' __/'is' __ 'a' __/'is' __ 'the'__/'is' __/'are'__) c:RelArg
                 { return (b.length==4)
                   ? `${a}\\text{ ${b[0]} ${b[2]} }${c}`
                   : `${a}\\text{ ${b[0]} }${c}` }
@@ -807,7 +809,7 @@ Algebraic = Choose / Sum / Summation / IndexedUnion / IndexedIntersect / Product
                   { return '-'+a }
 
     // Exp and higher precedence args
-    ExpArgs = Complement / Factorial / Multinomial / Prefix / Exp / Star / Atomic
+    ExpArgs = Complement / Factorial / Multinomial / Floor / Ceiling / Prefix / Exp / Star / Atomic
 
     // The choice of precedence of Function application vs Exp is tricky.
     // Consider e.g. 2^cos(x), f^2(x), 2^f(x), f^(-1)(x), and the nightmare
@@ -858,6 +860,11 @@ Algebraic = Choose / Sum / Summation / IndexedUnion / IndexedIntersect / Product
 // Multinomial coefficients
 Multinomial = 'multinomial('i _ a:Expression comma b:Expression _')'
             { return `\\left(${a},${b}\\right)` }
+// Floor and Ceiling
+Floor = 'floor('i _ a:Expression _')'
+            { return `\\left\\lfloor${a}\\right\\rfloor` }
+Ceiling = 'ceiling('i _ a:Expression _')'
+            { return `\\left\\lceil${a}\\right\\rceil` }
 
 // For convenience we define special Symbols beginning with '@' so that @P(k)
 // becomes (λ P k) and then replace λ with "LDE EFA" as a shortcut in

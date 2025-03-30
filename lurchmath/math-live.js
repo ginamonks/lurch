@@ -24,8 +24,15 @@ import { lurchToLatex, latexToLurch, lurchToPutdown } from './parsers/index.js'
 // Ensures the MathLive scripts are loaded, so you can do whatever you want with
 // the stuff they install in the global (window) object thereafter.
 const loadMathFieldClass = () => new Promise( ( resolve, reject ) => {
-    loadScript( 'https://unpkg.com/mathlive@0.100.0' ).then( () => {
-        loadScript( 'https://unpkg.com/@cortex-js/compute-engine@0.24.1' ).then( () => {
+  const base = new URL('..', import.meta.url)
+  const script1 = new URL('lde/dependencies/mathlive/mathlive.min.js', base)
+  const script2 = new URL('lde/dependencies/mathlive/compute-engine.min.js', base)
+    // loadScript( 'https://unpkg.com/mathlive@0.100.0' ).then( () => {
+    //     loadScript( 'https://unpkg.com/@cortex-js/compute-engine@0.24.1' ).then( () => {
+    // loadScript( '../lde/dependencies/mathlive/mathlive.min.js' ).then( () => {
+    //     loadScript( '../lde/dependencies/mathlive/compute-engine.min.js' ).then( () => {
+  loadScript(script1).then(() => {
+    loadScript(script2).then( () => {
             const tryToResolve = () => {
                 if ( window.MathfieldElement ) {
                     resolve()
@@ -44,7 +51,7 @@ const loadMathFieldClass = () => new Promise( ( resolve, reject ) => {
  * 
  * @type {string}
  */
-export const stylesheet = 'https://unpkg.com/mathlive@0.100.0/dist/mathlive-static.css'
+export const stylesheet = '../lde/dependencies/mathlive/mathlive-static.css'
 
 /**
  * An item that can be used in a {@link Dialog} and shows up as an equation

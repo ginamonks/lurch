@@ -13,7 +13,7 @@ const endTest = LurchOptions.endStudentTest
 // const startTest = 1
 // const endTest = 10
 
-// declare the acide array
+// declare the acid array
 acid=[]
 // define a nice utility for loading a test
 const loadtest = (name, folder='acid tests', extension='lurch',
@@ -95,26 +95,30 @@ if (LurchOptions.runStudentTests) {
 
 // Load Acid Tests
 if (LurchOptions.runAcidTests) {
-  Array.seq(k=>k,0,13).forEach( k => loadtest(`acid ${k}`) )
-  // Load other tests in the acid tests folder
-  loadtest('Transitive Chains')
-  loadtest('Cases')
-  loadtest('BIH Cases')
-  loadtest('user-thms')
-  loadtest('ArithmeticNatural')
-  loadtest('ArithmeticInteger')
-  loadtest('ArithmeticRational')
-  // Load Math 299 tests
-  loadtest('prop','math299')
-  loadtest('pred','math299')
-  loadtest('peanoBIH','math299')
-  loadtest('peano','math299')
-  loadtest('midterm','math299')
-  loadtest('recursion','math299')
-  loadtest('reals','math299')
-  loadtest('sets','math299')
-  loadtest('BIHchain','math299','txt','putdown','small BIH & trans chain test')
-  loadtest('inapplicable','math299','txt','putdown','testing an inapplicable')
+  // If LurchOptons.onetest is set, only load that test
+  if (LurchOptions.onetest!==undefined) loadtest(`acid ${LurchOptions.onetest}`)
+  else {
+    Array.seq(k=>k,0,13).forEach( k => loadtest(`acid ${k}`) )
+    // Load other tests in the acid tests folder
+    loadtest('Transitive Chains')
+    loadtest('Cases')
+    loadtest('BIH Cases')
+    loadtest('user-thms')
+    loadtest('ArithmeticNatural')
+    loadtest('ArithmeticInteger')
+    loadtest('ArithmeticRational')
+    // Load Math 299 tests
+    loadtest('prop','math299')
+    loadtest('pred','math299')
+    loadtest('peanoBIH','math299')
+    loadtest('peano','math299')
+    loadtest('midterm','math299')
+    loadtest('recursion','math299')
+    loadtest('reals','math299')
+    loadtest('sets','math299')
+    loadtest('BIHchain','math299','txt','putdown','small BIH & trans chain test')
+    loadtest('inapplicable','math299','txt','putdown','testing an inapplicable')
+  }
 }
 // Misc test zone - edit for one-off tests
 // loadtest(filename, studentFolder, ext, 'putdown/lurch', filename)
@@ -197,7 +201,8 @@ console.log(`Test result stored in the array 'acid'\n`)
 
 ///////////////////////////////////////////////////////////
 // closing
-console.log(defaultPen(`done! (${msToTime(Date.now()-start)})`))
+runtimeMS = Date.now()-start
+console.log(defaultPen(`done! (${msToTime(runtimeMS)})`))
 // don't echo anything
 undefined
 ///////////////////////////////////////////////////////////

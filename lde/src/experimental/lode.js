@@ -468,25 +468,13 @@ global.catdocs = ( ...files ) => {
   return ans
 }
 
-
 ////////////////////////////////////////////////////////////////////////////
 //
 // Welcome splash screen
 //
 console.log(`\nWelcome to ${defaultPen("𝕃𝕠𝕕𝕖")}`+
 ` - the Lurch Node app\n(type .help for help)\n`)
-// if there is an argument to lode.js, i.e., if someone runs this script as
-//
-// > node lode fname
-//  
-// then initialize the lode instance with the script named fname.js
-if (process.argv.length>2) {
-  let fname=process.argv[2]
-  initialize(fname)
-  // if there is no argument, try to load init.js in the current folder
-} else if ( fs.existsSync('init.js') ) {
-  initialize('init')
-}
+
 // start a new REPL context
 //
 // Note: that we use the useGlobal parameter so the current context is shared
@@ -538,6 +526,8 @@ rpl.defineCommand( "features", {
                       it with the optional filename, e.g. initialize('acidtests') 
       ${itemPen('compute(s)')}    : calls Algebrite.run(s) 
                       (see Algebrite docs at algebrite.org)')}
+      ${itemPen('benchmark()')}    : run Lode, validate some documents, then call
+                      'benchmark()' to see a report
 
       ${headingPen('Extra Packages')}  
       ${itemPen('Algebrite')}     : a computer algebra system (see algebrite.org)
@@ -681,12 +671,29 @@ rpl.defineCommand( "parsertest", {
 rpl.defineCommand( "makedocs", {
   help: "Run jsdocs to make the documentation.",
   action() {
-    console.log(defaultPen('Building docs...')) 
     try {
+      console.log(defaultPen('Building experimental docs...')) 
+      // this runs in the experimental folder
       execStr('rm -rf docs && jsdoc ./* -d docs -c utils/jsdoc-conf.json -u tutorials/ && node utils/post-docs')
       console.log(defaultPen('...done'))
     } catch (err) {
-      console.log('Error building docs.')
+      console.log('Error building experimental docs.')
+    }
+    try {
+      console.log(defaultPen('Building lde docs...')) 
+      // this runs in the lde folder
+      execStr('cd ../.. && npm run docs')
+      console.log(defaultPen('...done'))
+    } catch (err) {
+      console.log('Error building lde docs.')
+    }
+    try {
+      console.log(defaultPen('Building lurchmath docs...')) 
+      // this runs in the lurchmath folder
+      execStr('cd ../../../lurchmath && npm run docs')
+      console.log(defaultPen('...done'))
+    } catch (err) {
+      console.log('Error building lurchmath docs.')
     }
     this.displayPrompt()
   }
@@ -733,4 +740,18 @@ global.write = s => console.log(rpl.writer(s))
 // total time, number of instantiations created, etc.
 global.Accumulator = { }
 global.clearAccumulator = () => Accumulator = { }
+
+// if there is an argument to lode.js, i.e., if someone runs this script as
+//
+// > node lode fname
+//  
+// then initialize the lode instance with the script named fname.js
+if (process.argv.length>2) {
+  let fname=process.argv[2]
+  initialize(fname)
+  // if there is no argument, try to load init.js in the current folder
+} else if ( fs.existsSync('init.js') ) {
+  initialize('init')
+}
+
 /////////////////////////////////////////////

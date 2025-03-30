@@ -54,8 +54,14 @@ Object.assign(self, Compact)
 import Utils from "./utils.js"
 Object.assign(self, Utils)
 
+import { Atom } from '../../../lurchmath/atoms.js'
+self.Atom = Atom
+
 import { Message } from "../../../lurchmath/validation-messages.js"
 self.Message = Message
+
+import { getConverter } from '../../../lurchmath/math-live.js'
+self.getConverter = getConverter
 
 import { downloadFile } from "../../../lurchmath/upload-download.js"
 self.downloadFile = downloadFile
@@ -77,6 +83,15 @@ self.$ = (s) => {
 
 self.doc = () => {
   return Message.document(tinymce.activeEditor, "putdown").content.code
+}
+
+self.constants = () => {
+  const d = lc(doc())
+  interpret(d)
+  const ans = d.getDeclares()
+               .map(x=>x.getAttribute('lurchNotation'))
+               .filter( z => z !== undefined )
+  return ans
 }
 
 ////////////////////////////////////////////////////////

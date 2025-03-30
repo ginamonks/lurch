@@ -1,0 +1,235 @@
+<!-- @format -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Get Lurch!</title>
+    <meta charset="utf-8" />
+    <meta
+      name="description"
+      content="This is the home page for lurch.plus, the home of the Lurch proof assistant, plus additional content." />
+    <meta
+      name="keywords"
+      content="Lurch, Lurch plus, proof assistant, math academy, summer courses, math proof camp, math proofs, mathematical proof, proof class, proof course, summer math camp, summer math program, summer math class, math camp, math program, math class, MATHCOUNTS, AMC, AIME, USAMO, IMO, ARML, math contest training, math competition training, math olympiad, AP olympiad, Intel Science, ISEF, ISTS, Regeneron competition, Siemens competition, math gifted, summer school program, camps for kids, academic summer camp, summer academy, summer schools, summer school usa, summer academic programs, summer classes, academy of mathematics, university of scranton, Lehigh Valley ARML" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="../assets/media/favicon-L+.svg" />
+    <!-- load Font Awesome icon pack 
+     see https://fontawesome.com/search?m=free&o=r for more icons
+-->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet" />
+
+    <link
+      href="//fonts.googleapis.com/css?family=Open+Sans:400,600,400italic,700,300"
+      rel="stylesheet"
+      type="text/css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap"
+      rel="stylesheet" />
+
+    <link rel="stylesheet" href="../assets/css/monks.css" />
+    <link rel="stylesheet" href="../assets/css/lurchplus.css" />
+
+    <!-- <link rel='stylesheet' href='assets/css/bootstrap.min.css'> -->
+  </head>
+
+  <body>
+    <div id="leftnav">
+      <img
+        src="../assets/media/lurchlogo.png"
+        style="margin: 0px; border-radius: 5px; display: block"
+        width="190px" />
+
+      <ul>
+        <li
+          ><a href="../"><i class="fa-solid fa-house"></i>Home</a></li
+        >
+        <li><a href="../getlurch">Get Lurch!</a></li>
+        <li><a href="../teaching">Teaching with Lurch</a></li>
+        <li><a href="../theory">Documentation and Theory</a></li>
+        <li><a href="../talks">Lurch Talk Slides</a></li>
+        <li><a href="../100">100 Theorem Challenge!</a></li>
+        <li><a href="../about">About Lurch</a></li>
+      </ul>
+
+      <div id="contact">
+        <div>
+          <a href="mailto:monks@scranton.edu">Ken Monks</a>
+        </div>
+        <div>
+          <a href="https://monks.scranton.edu" target="_blank"
+            >monks.scranton.edu</a
+          >
+        </div>
+        <div>
+          <a href="https://proveitmath.org" target="_blank">proveitmath.org</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- flex column for content-block and footer-block -->
+    <div id="wrap">
+      <div id="content-block">
+        <div class="title-box">
+          <h1>Get Lurch!</h1>
+          <h2>Installing and Customizing Lurch on your computer</h2>
+        </div>
+        <p
+          >Most Lurch instructors will not need or want to install Lurch on
+          their computer, and will create and manage all of their content on
+          their GitHub site. While we don't recommend installing it locally for
+          most users, for developers or those of you who want to install it
+          locally anyway, we give some brief instructions here.</p
+        >
+        <p
+          >Lurch is a web app, and so it needs a web server running on your
+          computer if you would like to install a copy of your Lurch repository
+          locally for testing, experimenting, and creating new content before
+          publishing it on your site. Users who are familiar with
+          <code>git</code> can just <code>git clone</code> their GitHub
+          repository to their local drive and point their local server to that
+          folder.</p
+        >
+        <p
+          >Users who are not familiar with <code>git</code> or running a local
+          server can do the following.</p
+        >
+        <ol>
+          <li
+            >Clone your repository to a local copy.
+            <ol>
+              <li
+                >Download, Install, and Open GitHub Desktop. (<a
+                  href="https://desktop.github.com"
+                  target="_blank"
+                  >https://desktop.github.com</a
+                >)</li
+              >
+              <li>Sign in with your GitHub account.</li>
+              <li
+                >Choose <strong>File &gt; Clone Repository...</strong> from the
+                GitHub Desktop menu.</li
+              >
+              <li>Select your Lurch repository from the list.</li>
+              <li
+                >Choose a local folder to save the repository and click
+                <strong>Clone</strong>.</li
+              >
+            </ol>
+          </li>
+          <li
+            >Install VS Code from
+            <a href="https://code.visualstudio.com" target="_blank"
+              >https://code.visualstudio.com</a
+            >$^\star$ and then Open the Visual Studio Code application it
+            installed.
+            <ol>
+              <li
+                >Choose
+                <strong>File &gt; Add folder to workspace...</strong> from the
+                menu and select the local folder you chose for your cloned
+                repository above.</li
+              >
+              <li
+                >Install the
+                <a
+                  href="https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer"
+                  target="_blank"
+                  >Live Server extension</a
+                >.</li
+              >
+              <li
+                >Choose <strong>View &gt; Explorer</strong> from the VS Code
+                menu. It should show you all of the files and folders in your
+                local copy of the repository.</li
+              >
+              <li
+                >Right-click the <code>index.html</code> file in the explorer
+                pane and select <strong>Open with Live Server</strong>.</li
+              >
+              <li
+                >Your local copy of the site automatically opens in your
+                browser!</li
+              >
+            </ol>
+          </li>
+        </ol>
+        <div class="note-box small">
+          <p
+            >$^\star$Windows users:
+            <em
+              >If VS Code tells you that you don't have git installed, you can
+              obtain the latest Windows version
+              <a href="https://git-scm.com/downloads/win">here</a>. Run the
+              installer and accept all of the default answers except when it
+              asks you what editor you would like to use, choose VS Code from
+              the drop down menu. Then restart VS Code and everything should be
+              fine.</em
+            ></p
+          >
+        </div>
+      </div>
+
+      <div id="footer-block">
+        <footer>
+          <div class="container">
+            <div class="row">
+              <div class="col-xs-12">
+                <h3>
+                  <a href="http://monks.scranton.edu/" target="_blank"
+                    >Dr. Kenneth G. Monks</a
+                  >
+                </h3>
+                Department of Mathematics<br />
+                University of Scranton<br />
+                Scranton, PA 18510
+              </div>
+            </div>
+            <div class="row" id="more-contact-info">
+              <div class="col-xs-12 col-md-4" id="email-footer">
+                <img
+                  src="../assets/media/envelope.svg"
+                  style="vertical-align: middle; padding-right: 0.2em" />
+                <a href="mailto:monks@scranton.edu" target="_blank"
+                  >monks@scranton.edu</a
+                >
+              </div>
+              <div class="col-xs-12 col-md-4 center" id="lurch-footer">
+                <span class="checkmark" style="padding-right: 0.2em">✓</span>
+                <a href="http://lurch.plus">lurch.plus</a>
+              </div>
+              <div class="col-xs-12 col-md-4" id="proveit-footer">
+                <img
+                  src="../assets/media/therefore.svg"
+                  style="
+                    vertical-align: middle;
+                    padding-right: 0.2em;
+                    height: 0.8em;
+                  " />
+                <a href="https://proveitmath.org" target="_blank"
+                  >Prove it!&nbsp;Math Academy</a
+                >
+              </div>
+            </div>
+            <!-- row -->
+            <div id="copyright"> Copyright &copy; Kenneth G. Monks </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <script src="../assets/js/utils.js"></script>
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$']],
+          processEscapes: true
+        }
+      }
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+      id="MathJax-script"></script>
+  </body>
+</html>

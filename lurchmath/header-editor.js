@@ -63,10 +63,32 @@ export const setHeader = ( editor, header ) =>
  */
 export const install = editor => {
     // Utility functions and global-ish variables for dependency preview searching
+    const getDeclares = () => Atom.allIn( editor)
+      .filter( atom => {
+        const notation = atom.getMetadata('lurchNotation')
+        return notation && /^\s*declare/i.test(notation)
+      })
+
     const getPreviews = () => Atom.allIn( editor ).filter(
         atom => atom.getMetadata( 'type' ) == 'preview' )
+
     const previewExists = () => Atom.allIn( editor ).some(
-        atom => atom.getMetadata( 'type' ) == 'preview' )
+      atom => atom.getMetadata( 'type' ) == 'preview' )
+
+    const contextExists = () => (editor.getBody().querySelector('#context')) ? true : false
+    
+    const shiftHTML = ( div, html ) => {
+      const range = editor.dom.createRng()
+      range.setStart( div, 0)
+      range.collapse(true)
+      editor.selection.setRng(range)
+
+      editor.insertContent( html )
+      
+      editor.undoManager.clear()
+      editor.selection.collapse(true)
+    }
+
     let searchToolbar = null
     let searchBox = null
     let searchCounter = null
@@ -125,7 +147,7 @@ export const install = editor => {
                         searchText == ''
                         || relevantText(node).includes( searchText )
                     ) ? '' : 'none'
-                    numShown += node.style.display == '' ? 1 : 0
+                    numShown += (node.style.display == '' || searchText == '') ? 1 : 0
                     return
                 }
                 // Recursive case: Apply filter to all children, then show this
@@ -139,7 +161,8 @@ export const install = editor => {
                 ) ? '' : 'none'
             }
             getPreviews().forEach( preview => showRecursive( preview.element ) )
-            searchCounter.textContent = searchText == '' ? '' :
+            searchCounter.textContent = 
+            // searchText == '' ? '' :
                                         numShown == 1 ? '1 rule found' :
                                         `${numShown} rules found`
         }
@@ -148,9 +171,9 @@ export const install = editor => {
     } )
     // Whenever anything in the document changes (even the cursor position),
     // decide whether to show the search toolbar
-    editor.on( 'input NodeChange Paste Change Undo Redo', () => {
+    editor.on( 'input NodeChange Paste Change Undo Redo SelectionChange ExecCommand', () => {
         if ( searchToolbar ) {
-            const show = previewExists()
+            const show = contextExists()
             const wasShown = searchToolbar.style.display == ''
             searchToolbar.style.display = show ? '' : 'none'
             // If the toolbar just appeared, clear its search box
@@ -227,7 +250,7 @@ export const install = editor => {
     // dependencies) in the header.  This list of dependencies never leaves the
     // header, so this is the only way to edit it.
     editor.ui.registry.addMenuItem( 'editdependencyurls', {
-        text : 'Edit background material',
+        text : 'Add or remove context',
         tooltip : 'Edit the list of documents on which this one depends',
         icon : 'edit-block',
         onAction : () => {
@@ -241,7 +264,7 @@ export const install = editor => {
                     }
                 } )
             // Create the dialog, but do not populate it with dependencies yet.
-            const dialog = new Dialog( 'Edit background material', editor )
+            const dialog = new Dialog( 'Add or remove context documents', editor )
             dialog.json.size = 'medium'
             const listItem = new ListItem( 'dependencies' )
             listItem.setSelectable()
@@ -368,16 +391,22 @@ export const install = editor => {
     // the *contents of* the background material, so that student users who need
     // to see a list of all axioms, theorems, and rules in force can do so.
     // Revealing these previews also shows a search/filter box in the toolbar.
-    editor.ui.registry.addMenuItem( 'viewdependencyurls', {
+    editor.ui.registry.addMenuItem( 'viewcontext', {
         text : 'Show/Hide context',
         icon: 'preview',
-        shortcut : 'meta+alt+0',
+        shortcut : 'meta+Alt+0',
         tooltip : 'View the mathematical content on which this document depends',
         onAction : () => {
-            // If there are preview atoms in the document, remove them and be done
-            const existingPreviews = getPreviews()
-            if ( existingPreviews.length > 0 ) {
-                existingPreviews.forEach( preview => preview.element.remove() )
+
+            // get the document 
+            const doc = editor.getDoc()
+            // get the body element
+            const body = editor.getBody()
+
+            // If the context is shown, delete it and return
+            const existingContext = editor.getBody().querySelector('#context')
+            if ( existingContext ) {
+                existingContext.remove()
                 editor.selection.setCursorLocation( editor.getBody(), 0 )
                 // Also, if we have a cursor location stored from before we
                 // showed this preview, put the user's cursor location back
@@ -389,32 +418,106 @@ export const install = editor => {
                 }
                 return
             }
-            // If not, we have to create them from the content in the header.
-            // If there is no content in the header, report that and be done.
-            const header = getHeader( editor )
-            if ( !header ) {
-                Dialog.notify( editor, 'warning',
-                    'This document does not import any background material.',
-                    5000 )
-                return
-            }
-            // Accumulate the HTML representation of all previews of all
-            // dependencies in the header.
-            let allPreviewHTML = ''
-            Dependency.topLevelDependenciesIn( header ).forEach( dependency => {
-                const preview = Atom.newBlock( editor, '', { type : 'preview' } )
-                preview.imitate( dependency )
-                allPreviewHTML += preview.element.outerHTML
-            } )
+
+            // If not, we have to create them from the content in the header and
+            // the declarations.
+
             // Remember where the user's cursor was before we insert the preview,
             // because it may be large and require them to scroll to see it.
             // If they then hide it, it's nice to jump back to where they were.
             editor.selectionBeforePreview = editor.selection.getRng()
-            // Insert it into the document.
-            editor.selection.setCursorLocation() // == start
-            editor.insertContent( allPreviewHTML )
-            editor.undoManager.clear()
-            editor.selection.setCursorLocation() // deselect new insertions
+
+            // get the dependency content
+            const header = getHeader( editor )
+
+            // Accumulate the HTML representation of all previews of all
+            // dependencies in the header.
+            let allPreviewHTML = ''
+            if (header)
+              Dependency.topLevelDependenciesIn( header ).forEach( dependency => {
+                const preview = Atom.newBlock( editor, '', { type: 'preview' } )
+                preview.imitate( dependency )
+                allPreviewHTML += preview.element.outerHTML
+              } )
+
+
+            // wrap everything in a #context div and insert it
+            shiftHTML( body, 
+              `<div class='lurch-atom' id='context' contenteditable='true'>
+                 ${allPreviewHTML}
+               </div>`
+            )
+            const context = editor.getBody().querySelector('#context')
+
+
+            // now that the context is shown, fetch all of the declares in both
+            // the context and the document itself and add it to the top. To
+            // make it more legible, upper case all the 'declares'.
+            let decHTML = ''
+            getDeclares().forEach(dec => {
+                decHTML += `${dec.element.outerHTML.replace('declare','Declare')}.<br/>`
+            })
+            
+            // create a title for the context and a subtitle for the Constant
+            // decs.  We don't make a subtitle for the dependencies because they
+            // can just type their own (or make a fake dependency at the top of
+            // the import chain that only has flarf).
+            const title = `<h1 id='contextTitle'>Mathematical Context</h1>`
+            const subtitle = `<h2>Constants</h2>`
+
+            // then format the output, taking into account when things are empty
+            let HTML = ''
+            // if they are both empty 
+            if (!allPreviewHTML) {
+              // no constants or previews
+              if (!decHTML) {
+                HTML = 
+                  `${title}
+                   <p>There is nothing defined in this document's context.</p>`
+              // there are declarations but no previews
+              } else {
+                HTML = 
+                  `${title}
+                   ${subtitle}
+                   <p>The following symbols are declared to be 
+                      constants in this document.</p> 
+                   <div id='declaresPanel' contenteditable='false'>
+                      ${decHTML}
+                   </div>
+                   <p>There is no math defined in this document's context.</p>`
+              }
+            // otherwise the previews are already inserted  
+            } else { 
+              if (!decHTML) {
+                HTML = 
+                  `${title}
+                   <p>There are no globally defined constants in this document.</p>` 
+              } else { 
+                HTML =
+                  `${title}
+                   ${subtitle}
+                   <p>The following symbols are declared to be 
+                      constants in this document.</p> 
+                   <div id='declaresPanel' contenteditable='false'>
+                      ${decHTML}
+                   </div>` 
+              }
+            }
+            shiftHTML( context, HTML)
+
+            // hopefully this will lock everything down
+            context.contentEditable='false'
+
+            setTimeout( () => { 
+              const context = editor.getBody().querySelector('#context')
+              context.contentEditable = 'false'
+              context.setAttribute( 'contenteditable', 'false' )
+              // after checking this be sure nothing is selected by TinyMCE and
+              // the cursor is at the beginning of the document
+              editor.selection.select(editor.getBody(), true) 
+              editor.selection.collapse(true) 
+            } , 0)
+            
             editor.getWin().scrollTo(0, 0) // scroll the window to the top
         }
     } )

@@ -18,38 +18,67 @@ const openLurch = url => {
   window.open(url, '_blank', features)
 }
 
-// document.addEventListener("DOMContentLoaded", function () {
-//   // Get the left nav UL element
-//   const navList = document.getElementById("anchor-links");
+// open .lurch url's in a separate tab
+document.addEventListener('click', (event) => {
+ const link = event.target.closest('a') // Check if the clicked element is an anchor
+ if (link && !link.hasAttribute('target') && 
+     link.getAttribute('href')?.endsWith('.lurch')) {
+   event.preventDefault() // Prevent default behavior
+   window.open(link.href, '_blank') // Open link in a new tab
+ }
+})
 
-//   // Find all span elements with id attributes that start with "nav-"
-//   const navItems = document.querySelectorAll("span[id^='nav-']");
+// enable clicking on the completed rows in the 100 theorem table
+document.addEventListener('DOMContentLoaded', function () {
+  const rows = document.querySelectorAll('tr[data-href]') // Select only rows with data-href
+  rows.forEach(row => {
+    row.addEventListener('click', function () {
+      const url = this.getAttribute('data-href')
+      if (url) {
+        openLurch(url)
+        // window.location.href = url // Navigate to the URL
+      }
+    })
+  })
+})
 
-//   navItems.forEach(function (item) {
-//     const id = item.id;              // Get the id attribute (e.g., "nav-intro")
-//     const label = item.dataset.label; // Get the data-label attribute
+// make submenus collapsible
+document.querySelectorAll('.has-submenu').forEach(item => {
+  item.addEventListener('click', () => {
+    const submenu = item.nextElementSibling
+    const icon = item.querySelector('i')
 
-//     // Create an LI element for each anchor
-//     const listItem = document.createElement("li");
+    // Toggle submenu visibility
+    submenu.classList.toggle('hidden')
 
-//     // Create the anchor link
-//     const link = document.createElement("a");
-//     link.href = `#${id}`;
-//     link.textContent = label;        // Set the text from the data-label attribute
+    // Toggle icon class
+    icon.classList.toggle('fa-caret-down')
+    icon.classList.toggle('fa-caret-right')
+  })
+})
 
-//     // Append the link to the list item, and the list item to the nav
-//     listItem.appendChild(link);
-//     navList.appendChild(listItem);
-//   });
-// });
+// Function to load the state of checkboxes from localStorage
+const loadCheckboxState = () => {
+  document.querySelectorAll('.contains-task-list input[type="checkbox"]')
+          .forEach( (checkbox,n) => {
+    checkbox.id = `checkbox-${n}`
+    const isChecked = localStorage.getItem(checkbox.id) === 'true'
+    checkbox.checked = isChecked
+    checkbox.parentElement.classList.toggle('checked', isChecked)
+  })
+}
 
-// window.onload = function () {
-//   document.querySelectorAll('#leftnav li a').forEach(anchor => {
-//     anchor.addEventListener('click', function (e) {
-//       e.preventDefault()
-//       const targetId = this.getAttribute('href').substring(1)
-//       document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' })
-//     })
-//   })
-// }
+// Function to save the state of checkboxes to localStorage
+const saveCheckboxState =  (event) => {
+  const checkbox = event.target
+  localStorage.setItem(checkbox.id, checkbox.checked)
+  checkbox.parentElement.classList.toggle('checked', checkbox.checked)
+}
 
+// Attach change event listeners to all checkboxes
+document.querySelectorAll('.contains-task-list input[type="checkbox"]').forEach(checkbox => {
+  checkbox.addEventListener('change', saveCheckboxState)
+})
+
+// Load the checkbox state when the page loads
+loadCheckboxState()

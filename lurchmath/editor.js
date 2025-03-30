@@ -193,7 +193,7 @@ window.Lurch = {
                 'removeformat'
             ),
             document : buildMenu( 'Document',
-                'viewdependencyurls',
+                'viewcontext',
                 'validate clearvalidation',
                 'docsettings togglemeaning'
             ),
@@ -258,6 +258,7 @@ window.Lurch = {
                     MathLiveCSS
                 ],
                 visual_table_class : 'lurch-borderless-table',
+                noneditable_class: 'mceNonEditable',
                 height : "100%",
                 promotion : false, // disable premium features advertisement
                 toolbar : options.toolbarData,
@@ -307,18 +308,18 @@ window.Lurch = {
                     } )            
                     // Add About Lurch menu item
                     editor.ui.registry.addMenuItem( 'aboutlurch', {
-                        text : 'About Lurch for Math 299',
+                        text : 'About Lurch',
                         // icon : 'help',
-                        tooltip : 'About Lurch for Math 299',
+                        tooltip : 'About Lurch',
                         onAction : () => window.open(
-                            '/lurch', '_blank' )
+                            './about', '_blank' )
                     } )
 
                     // Add red pen menu item
                     editor.ui.registry.addMenuItem( 'redpen', {
                         text : 'Grading pen',
                         tooltip : 'Enable grading pen style',
-                        shortcut : 'meta+shift+G',
+                        shortcut : 'meta+Shift+G',
                         icon : 'highlight-bg-color',
                         onAction : () => {
                             editor.execCommand( 'Italic' )
@@ -354,7 +355,25 @@ window.Lurch = {
                             return false
                         }
                     } )
+                     
+                    // when using the fullscreen plugin, check if the app is changed
+                    // to full screen and if so toggle the visibility of the
+                    // Lurch menu and toolbar and Logo
+                    editor.on('FullscreenStateChanged', function(e) {
 
+                        if (e.state) {
+                            // Hide toolbar and menus
+                            document.querySelector('.tox-editor-header').style.display = 'none'
+                            // Hide status bar (we don't have one)
+                            // document.querySelector('.tox-statusbar').style.display = 'none' 
+                        } else {
+                            // Show toolbar and menus
+                            document.querySelector('.tox-editor-header').style.display = ''
+                            // Show status bar (we don't have one)
+                            // document.querySelector('.tox-statusbar').style.display = '' 
+                        }
+                    })
+                  
                     // Do not let the user leave the page accidentally, only on
                     // purpose (after confirming via dialog).  See docs above
                     // for the default value of this feature.
